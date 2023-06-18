@@ -1,6 +1,6 @@
 # Maintainer: HE7086 <me@heyi7086.com>
 pkgname=battery-tracker-git
-pkgver=r1.4d7c6f0
+pkgver=r1.5fbdc92
 pkgrel=1
 pkgdesc="Battery tracker"
 arch=("x86_64")
@@ -27,5 +27,5 @@ build() {
 
 package() {
     cd "$pkgname"
-    cargo install --no-track --frozen --root "$pkgdir/usr/" --path .
+    cargo install --offline --no-track --root "$pkgdir/usr/" --path .
 }
