@@ -1,0 +1,11 @@
+[Unit]
+Description=Battery Tracker Daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/battery-tracker
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

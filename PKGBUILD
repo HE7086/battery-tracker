@@ -1,0 +1,31 @@
+# Maintainer: HE7086 <me@heyi7086.com>
+pkgname=battery-tracker-git
+pkgver=r1.4d7c6f0
+pkgrel=1
+pkgdesc="Battery tracker"
+arch=("x86_64")
+url="https://github.com/HE7086/battery-tracker"
+license=("MIT")
+makedepends=("git" "cargo")
+source=("$pkgname::git+https://github.com/HE7086/battery-tracker.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$pkgname"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    cd "$pkgname"
+    cargo fetch --locked --target "$CARCH-unknown-linux-gnu"
+}
+
+build() {
+    cd "$pkgname"
+    cargo build --frozen --release
+}
+
+package() {
+    cd "$pkgname"
+    cargo install --no-track --frozen --root "$pkgdir/usr/" --path .
+}
