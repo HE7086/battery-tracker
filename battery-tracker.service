@@ -6,6 +6,7 @@ Type=simple
 ExecStart=/usr/bin/battery-tracker
 Restart=on-failure
 RestartSec=5s
+ReadWritePaths=/var/lib/battery-tracker
 
 [Install]
 WantedBy=multi-user.target
