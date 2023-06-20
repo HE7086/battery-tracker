@@ -2,7 +2,7 @@ use anyhow::Result;
 use chrono::Utc;
 use clap::Parser;
 use serde_json::{Map, Value};
-use std::fs::{self, File};
+use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::Path;
 use std::thread::sleep;
@@ -40,6 +40,12 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    if !args.foreground {
+        if !Path::exists(Path::new(args.output.as_str())) {
+            File::create(args.output.as_str())?;
+        }
+    }
+
     loop {
         run(&args)?;
         sleep(Duration::new(args.interval, 0));
@@ -74,7 +80,7 @@ fn run(args: &Args) -> Result<()> {
         if args.foreground {
             println!("{}", serde_json::to_string_pretty(&map)?);
         } else {
-            let mut writer = BufWriter::new(File::open(args.output.as_str())?);
+            let mut writer = BufWriter::new(OpenOptions::new().append(true).open(args.output.as_str())?);
             writer.write(serde_json::to_string(&map)?.as_bytes())?;
         }
     }
