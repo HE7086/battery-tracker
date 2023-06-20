@@ -29,6 +29,6 @@ package() {
     cd "$pkgname"
     cargo install --offline --no-track --root "$pkgdir/usr/" --path .
 
-    install -dm755 /var/lib/battery-tracker
+    install -dm755 "$pkgdir/var/lib/battery-tracker"
     install -Dm755 battery-tracker.service "$pkgdir/usr/lib/systemd/system/battery-tracker.service"
 }
