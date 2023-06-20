@@ -82,6 +82,7 @@ fn run(args: &Args) -> Result<()> {
         } else {
             let mut writer = BufWriter::new(OpenOptions::new().append(true).open(args.output.as_str())?);
             writer.write(serde_json::to_string(&map)?.as_bytes())?;
+            writer.write("\n".as_bytes())?;
         }
     }
     Ok(())
