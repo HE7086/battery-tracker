@@ -2,6 +2,8 @@
 
 import argparse
 import json
+import os
+import glob
 
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -14,7 +16,8 @@ def main():
     parser.add_argument("filename")
     args = parser.parse_args()
     if not args.filename:
-        args.filename = "/var/lib/battery-tracker/battery.log"
+        files = glob.glob('/var/lib/battery-tracker/*')
+        args.filename = max(files, key=os.path.getctime)
 
     time_arr = []
     cap_arr = []
