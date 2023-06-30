@@ -41,13 +41,10 @@ fn main() -> Result<()> {
     }
 
     if !args.foreground {
-        if !Path::exists(Path::new(args.output.as_str())) {
-            File::create(args.output.as_str())?;
-        }
-
         let mut file = PathBuf::from(&args.output);
         file.push(format!("battery-{}.log", Utc::now().to_rfc3339()));
         args.output = String::from(file.to_string_lossy());
+        File::create(&args.output)?;
     }
 
     loop {
