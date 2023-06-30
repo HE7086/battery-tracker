@@ -4,7 +4,7 @@ use clap::Parser;
 use serde_json::{Map, Value};
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -28,12 +28,12 @@ struct Args {
     interval: u64,
 
     /// Output location for logs
-    #[arg(short, long, default_value_t = String::from("/var/lib/battery-tracker/battery.log"))]
+    #[arg(short, long, default_value_t = String::from("/var/lib/battery-tracker"))]
     output: String,
 }
 
 fn main() -> Result<()> {
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     if args.once {
         run(&args)?;
@@ -44,6 +44,10 @@ fn main() -> Result<()> {
         if !Path::exists(Path::new(args.output.as_str())) {
             File::create(args.output.as_str())?;
         }
+
+        let mut file = PathBuf::from(&args.output);
+        file.push(format!("battery-{}.log", Utc::now().to_rfc3339()));
+        args.output = String::from(file.to_string_lossy());
     }
 
     loop {
