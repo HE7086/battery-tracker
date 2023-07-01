@@ -11,19 +11,12 @@ import matplotlib.dates as mdates
 
 time_format = "%Y-%m-%dT%H:%M:%S"
 
-def main():
-    parser = argparse.ArgumentParser(prog="battery status plotter")
-    parser.add_argument("filename")
-    args = parser.parse_args()
-    if not args.filename:
-        files = glob.glob('/var/lib/battery-tracker/*')
-        args.filename = max(files, key=os.path.getctime)
-
+def plot(filename):
     time_arr = []
     cap_arr = []
     last_status = ""
 
-    with open(args.filename, "r") as f:
+    with open(filename, "r") as f:
         for line in f:
             j = json.loads(line)
 
@@ -42,6 +35,17 @@ def main():
 
     for t, c in zip(time_arr, cap_arr):
         plt.plot(t, c)
+
+def main():
+    parser = argparse.ArgumentParser(prog="battery status plotter")
+    parser.add_argument("file", nargs="*")
+    args = parser.parse_args()
+    if not args.file:
+        files = glob.glob('/var/lib/battery-tracker/*')
+        args.file = [max(files, key=os.path.getctime)]
+
+    for file in args.file:
+        plot(file)
 
     plt.xlabel("Time")
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(time_format))
