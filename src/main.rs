@@ -63,27 +63,25 @@ fn run(args: &Args) -> Result<()> {
 
         let path = power_supply.join(name).join("uevent");
         let mut map = Map::new();
-        let uevent = File::open(path)?;
-        let lines = BufReader::new(uevent).lines();
-        for line in lines {
-            let line = line?;
+        let uevent = BufReader::new(File::open(path)?);
+        for line in uevent.lines().filter_map(|l| l.ok()) {
             let mut split = line.split("=");
 
-            #[cfg(debug_assertions)]
-            assert_eq!(split.clone().count(), 2);
-
-            let key = split.next().unwrap().trim_start_matches("POWER_SUPPLY_");
-            let value = split.next().unwrap();
-            map.insert(key.to_string(), Value::String(value.to_owned()));
+            let msg = "uevent format error";
+            let key = split.next().expect(msg).trim_start_matches("POWER_SUPPLY_");
+            let value = split.next().expect(msg);
+            map.insert(key.to_string(), Value::String(value.to_string()));
         }
         map.insert("TIME".to_string(), Value::String(Utc::now().to_rfc3339()));
 
         if args.foreground {
             println!("{}", serde_json::to_string_pretty(&map)?);
         } else {
-            let mut writer = BufWriter::new(OpenOptions::new().append(true).open(args.output.as_str())?);
+            let file = OpenOptions::new().append(true).open(args.output.as_str())?;
+            let mut writer = BufWriter::new(file);
             writer.write(serde_json::to_string(&map)?.as_bytes())?;
             writer.write("\n".as_bytes())?;
+            writer.flush()?;
         }
     }
     Ok(())
